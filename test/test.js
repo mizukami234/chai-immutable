@@ -30,7 +30,7 @@ if (!chai) {
 const clonedImmutable = clone(Immutable);
 
 const { assert, expect } = chai;
-const { List, Map, Set, Stack } = Immutable;
+const { List, Map, Set, Stack, Record } = Immutable;
 
 /**
  * Test helper to check that a given function (wrapping the assertion) will
@@ -183,6 +183,17 @@ describe('chai-immutable', function() {
 
       it('should work if using different copies of Immutable', function() {
         expect(clonedImmutableList).to.equal(List.of(1, 2, 3));
+      });
+
+      it('should work with Record', function() {
+        const R = Record({ x: 0, y: 0 }); // eslint-disable-line new-cap
+        const r1 = new R({ x: 1, y: 2 });
+        const r2 = new R({ x: 1, y: 2 });
+        const r3 = new R({ x: 2, y: 1 });
+        const r4 = r1.set('x', 2);
+        expect(r1).to.equal(r2);
+        expect(r1).to.not.equal(r3);
+        expect(r1).to.not.equal(r4);
       });
     });
 
@@ -943,6 +954,17 @@ describe('chai-immutable', function() {
 
       it('should work if using different copies of Immutable', function() {
         assert.equal(clonedImmutableList, List.of(1, 2, 3));
+      });
+
+      it('should work with Record', function() {
+        const R = Record({ x: 0, y: 0 }); // eslint-disable-line new-cap
+        const r1 = new R({ x: 1, y: 2 });
+        const r2 = new R({ x: 1, y: 2 });
+        const r3 = new R({ x: 2, y: 1 });
+        const r4 = r1.set('x', 2);
+        assert.equal(r1, r2);
+        assert.notEqual(r1, r3);
+        assert.notEqual(r1, r4);
       });
     });
 

@@ -15,7 +15,7 @@
 })(this, Immutable => (chai, utils) => {
   function isImmutable(value) {
     if (typeof Immutable.isImmutable === 'undefined') {
-      return Immutable.Iterable.isIterable(value);
+      return Immutable.isCollection(value) || value instanceof Immutable.Record;
     } else {
       return Immutable.isImmutable(value);
     }
@@ -25,7 +25,7 @@
 
   function assertIsIterable(obj) {
     new Assertion(obj).assert(
-      Immutable.Iterable.isIterable(obj),
+      Immutable.isCollection(obj),
       'expected #{this} to be an Iterable'
     );
   }
@@ -55,7 +55,7 @@
       function() {
         const obj = this._obj;
 
-        if (Immutable.Iterable.isIterable(obj)) {
+        if (Immutable.isCollection(obj)) {
           const { size } = obj;
           new Assertion(size).a('number');
 
@@ -200,10 +200,10 @@
     return function(val) {
       const obj = this._obj;
 
-      if (Immutable.Iterable.isIterable(obj)) {
+      if (Immutable.isCollection(obj)) {
         const isIncluded =
           obj.includes(val) ||
-          (Immutable.Iterable.isIterable(val) && obj.isSuperset(val));
+          (Immutable.isCollection(val) && obj.isSuperset(val));
         this.assert(
           isIncluded,
           'expected #{act} to include #{exp}',
@@ -338,14 +338,14 @@
     return function(keys) {
       const obj = this._obj;
 
-      if (Immutable.Iterable.isIterable(obj)) {
+      if (Immutable.isCollection(obj)) {
         const ssfi = utils.flag(this, 'ssfi');
 
         switch (utils.type(keys)) {
           case 'Object':
             if (Immutable.Iterable.isIndexed(keys)) {
               keys = keys.toJS();
-            } else if (Immutable.Iterable.isIterable(keys)) {
+            } else if (Immutable.isCollection(keys)) {
               keys = keys.keySeq().toJS();
             } else {
               keys = Object.keys(keys);
@@ -555,7 +555,7 @@
     return function(path, val) {
       const obj = this._obj;
 
-      if (Immutable.Iterable.isIterable(obj)) {
+      if (Immutable.isCollection(obj)) {
         const isNested = utils.flag(this, 'nested');
         const negate = utils.flag(this, 'negate');
 
@@ -592,7 +592,7 @@
 
         if (arguments.length > 1) {
           let isEqual;
-          if (Immutable.Iterable.isIterable(val)) {
+          if (Immutable.isCollection(val)) {
             isEqual = Immutable.is(val, value);
           } else {
             isEqual = val === value;
@@ -840,7 +840,7 @@
     // It seems like we shouldn't actually need this check, however,
     // `assert.equal` actually behaves differently than its BDD counterpart!
     // Namely, the BDD version is strict while the "assert" one isn't.
-    if (Immutable.Iterable.isIterable(actual)) {
+    if (isImmutable(actual)) {
       return new Assertion(actual).equal(expected);
     } else {
       return originalEqual(actual, expected);
@@ -894,7 +894,7 @@
    */
 
   assert.notEqual = (actual, expected) => {
-    if (Immutable.Iterable.isIterable(actual)) {
+    if (Immutable.isCollection(actual)) {
       return new Assertion(actual).not.equal(expected);
     } else {
       return originalNotEqual(actual, expected);
